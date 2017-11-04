@@ -5,7 +5,7 @@ import RecentlyEnteredList from './RecentlyEnteredList'
 
 class CurrencyConverter extends Component {
 
-  constructor(props){
+  constructor(props) {
     super(props);
     this.state = {
       base: '',
@@ -15,31 +15,36 @@ class CurrencyConverter extends Component {
     }
     this.addCurrencyConversion = this.addCurrencyConversion.bind(this);
   }
-  
-  componentDidMount(){
+
+  componentDidMount() {
     this.fetchEuroConversionRates();
     this.fetchConversionHistory();
   }
 
-  fetchEuroConversionRates(){
+  fetchEuroConversionRates() {
     fetch('https://txf-ecb.glitch.me/rates').then((result) => {
       return result.json()
     }).then((parsedResult) => {
-      this.setState({...parsedResult})
+      const euroRate = {
+        currency: "EUR",
+        rate: "1"
+      }
+      parsedResult.rates.unshift(euroRate);
+      this.setState({ ...parsedResult })
     })
   }
 
-  fetchConversionHistory(){
+  fetchConversionHistory() {
     const history = localStorage.getItem('currencyConversionHistory');
-    if(history) {
+    if (history) {
       this.setState({
         history: history.split(',')
       })
     }
   }
 
-  addCurrencyConversion(conversion){
-    const history = [conversion, ...this.state.history]
+  addCurrencyConversion(conversion) {
+    const history = [`${conversion} at ${this.state.time}`, ...this.state.history]
     this.setState({
       history
     });
@@ -51,7 +56,7 @@ class CurrencyConverter extends Component {
       <div className="currency-converter container">
         <h1>Currency Converter</h1>
         <CurrencyForm rates={this.state.rates} addCurrencyConversion={this.addCurrencyConversion} />
-        <RecentlyEnteredList  history={this.state.history} />
+        <RecentlyEnteredList history={this.state.history} />
       </div>
     );
   }

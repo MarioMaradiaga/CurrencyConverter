@@ -29,6 +29,14 @@ class CurrencyForm extends Component {
       this.setState({
         error: 'Invalid amount to convert!'
       })
+    } else if (this.state.currencyAIndex === -1) {
+      this.setState({
+        error: 'Select a currency A!'
+      })
+    } else if (this.state.currencyBIndex === -1) {
+      this.setState({
+        error: 'Select a currency B!'
+      })
     } else {
       const amount = parseFloat(this.state.amount)
       const currencyA = this.props.rates[this.state.currencyAIndex];
