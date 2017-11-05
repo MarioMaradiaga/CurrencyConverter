@@ -9,7 +9,7 @@ class RecentlyEnteredList extends Component {
       <div className="container currency-recent-list">
         <h2>Recent Conversions</h2>
         <ul className="currency-form">
-          {listItems}
+          {listItems.length ? listItems : "No past conversions"}
         </ul>
       </div>
     );

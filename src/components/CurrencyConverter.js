@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import 'whatwg-fetch';
 import CurrencyForm from './CurrencyForm'
 import RecentlyEnteredList from './RecentlyEnteredList'
+import RateHistory from './RateHistory'
 
 class CurrencyConverter extends Component {
 
@@ -11,14 +12,15 @@ class CurrencyConverter extends Component {
       base: '',
       rates: [],
       time: '',
-      history: []
+      history: [],
+      rateHistory: []
     }
     this.addCurrencyConversion = this.addCurrencyConversion.bind(this);
   }
 
   componentDidMount() {
-    this.fetchEuroConversionRates();
     this.fetchConversionHistory();
+    this.fetchEuroConversionRates();
   }
 
   fetchEuroConversionRates() {
@@ -30,7 +32,15 @@ class CurrencyConverter extends Component {
         rate: "1"
       }
       parsedResult.rates.unshift(euroRate);
-      this.setState({ ...parsedResult })
+      let rateHistory = [parsedResult];
+      if (this.state.rateHistory.length !== 0) {
+        rateHistory = [...this.state.rateHistory];
+        if (this.state.rateHistory[this.state.rateHistory.length - 1].time < parsedResult.time) {
+          rateHistory.push(parsedResult);
+        }
+      } 
+      this.setState({ ...parsedResult, rateHistory })
+      localStorage.setItem('currencyConversionRateHistory', JSON.stringify(rateHistory))
     })
   }
 
@@ -39,6 +49,12 @@ class CurrencyConverter extends Component {
     if (history) {
       this.setState({
         history: history.split(',')
+      })
+    }
+    const rateHistory = localStorage.getItem('currencyConversionRateHistory');
+    if (rateHistory) {
+      this.setState({
+        rateHistory: JSON.parse(rateHistory)
       })
     }
   }
@@ -57,6 +73,7 @@ class CurrencyConverter extends Component {
         <h1>Currency Converter</h1>
         <CurrencyForm rates={this.state.rates} addCurrencyConversion={this.addCurrencyConversion} />
         <RecentlyEnteredList history={this.state.history} />
+        <RateHistory rateHistory={this.state.rateHistory} />
       </div>
     );
   }
